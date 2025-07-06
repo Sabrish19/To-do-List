@@ -178,3 +178,74 @@ h1 {
     gap: 0.5rem;
   }
 }
+body.light {
+  background-color: #f9f9f9;
+  color: #111;
+}
+
+body.dark-mode {
+  background-color: #1c1c1c;
+  color: #f5f5f5;
+}
+
+.todo-box {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.input-area input,
+.input-area select,
+button {
+  margin: 6px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+}
+
+.task {
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.task.complete {
+  background-color: rgba(0, 255, 0, 0.1);
+  text-decoration: line-through;
+}
+
+.task-text {
+  cursor: pointer;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.actions button {
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.google-btn,
+.signout-btn,
+.toggle-theme {
+  padding: 8px 12px;
+  margin: 10px 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.toast {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #ffcccb;
+  color: black;
+}
+

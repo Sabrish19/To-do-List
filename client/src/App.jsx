@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
-
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://to-do-list-1ttx.onrender.com';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -22,23 +20,30 @@ function App() {
   const [endTime, setEndTime] = useState('');
   const [theme, setTheme] = useState('light');
 
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     fetchUser();
-    fetchTasks();
   }, []);
 
   useEffect(() => {
-    document.body.className = theme;
+    if (user) fetchTasks();
+  }, [user]);
+
+  useEffect(() => {
+    document.body.className = theme === 'dark' ? 'dark-mode' : 'light';
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
   };
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get('/auth/user');
-      if (res.data.user) setUser(res.data.user);
+      const res = await fetch(`${API_BASE}/auth/user`, { credentials: 'include' });
+      const data = await res.json();
+      if (data.user) setUser(data.user);
     } catch {
       setToast('You are offline or server is down.');
     }
@@ -46,7 +51,7 @@ function App() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get('/api/tasks');
+      const res = await axios.get(`${API_BASE}/api/tasks`);
       setTasks(res.data);
     } catch {
       setToast('No tasks.');
@@ -58,16 +63,8 @@ function App() {
     if (!assignee.trim()) return showToast('You must assign this task to someone.');
 
     try {
-      const newTask = {
-        text: taskInput,
-        status,
-        assignee,
-        startDate,
-        endDate,
-        startTime,
-        endTime,
-      };
-      const res = await axios.post('/api/tasks', newTask);
+      const newTask = { text: taskInput, status, assignee, startDate, endDate, startTime, endTime };
+      const res = await axios.post(`${API_BASE}/api/tasks`, newTask);
       setTasks([...tasks, res.data]);
       setTaskInput('');
       setAssignee('');
@@ -83,7 +80,7 @@ function App() {
 
   const deleteTask = async (id) => {
     try {
-      await axios.delete(`/api/tasks/${id}`);
+      await axios.delete(`${API_BASE}/api/tasks/${id}`);
       setTasks(tasks.filter(t => t._id !== id));
       showToast('Task deleted.');
     } catch {
@@ -93,7 +90,9 @@ function App() {
 
   const toggleComplete = async (task) => {
     try {
-      const res = await axios.put(`/api/tasks/${task._id}`, { completed: !task.completed });
+      const res = await axios.put(`${API_BASE}/api/tasks/${task._id}`, {
+        completed: !task.completed
+      });
       setTasks(tasks.map(t => (t._id === task._id ? res.data : t)));
       showToast('Task status updated.');
     } catch {
@@ -118,7 +117,7 @@ function App() {
     if (!editAssignee.trim()) return showToast('Assignee cannot be empty.');
 
     try {
-      const res = await axios.put(`/api/tasks/${id}`, {
+      const res = await axios.put(`${API_BASE}/api/tasks/${id}`, {
         text: editText,
         assignee: editAssignee
       });
@@ -136,11 +135,11 @@ function App() {
   };
 
   const handleLogin = () => {
-    window.location.href = `${axios.defaults.baseURL}/auth/google`;
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   const handleLogout = () => {
-    window.location.href = `${axios.defaults.baseURL}/auth/logout`;
+    window.location.href = `${API_BASE}/auth/logout`;
   };
 
   const filteredTasks = tasks.filter(task => {
@@ -152,7 +151,6 @@ function App() {
   return (
     <div className="todo-box">
       <h1 style={{ textAlign: 'center' }}>TaskMaster ✨</h1>
-
       <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
         <button className="toggle-theme" onClick={toggleTheme}>Theme</button>
       </div>
