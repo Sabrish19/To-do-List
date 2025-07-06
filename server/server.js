@@ -67,7 +67,7 @@ app.get('/auth/google/callback',
 // Logout
 app.get('/auth/logout', (req, res) => {
   req.logout(() => {
-    res.redirect('http://localhost:5173');
+    res.redirect(process.env.CLIENT_REDIRECT_URL || "http://localhost:5173/dashboard");
   });
 });
 
