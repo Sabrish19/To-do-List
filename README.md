@@ -89,7 +89,7 @@ npm run dev
 * Multiple task can be assigned to a user
 * Google OAuth handles session via cookies (withCredentials enabled)
 
-## Loom Video
+##  Video
 
  Demo : [https://youtu.be/ec9-xzWh-Rk?si=VQTbGfYcVBNFrB3i]
 
