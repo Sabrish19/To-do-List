@@ -94,11 +94,10 @@ npm run dev
  Demo : [https://youtu.be/ec9-xzWh-Rk?si=VQTbGfYcVBNFrB3i]
 
 ## Architecture Diagram
-
-
+[Blank diagram.pdf](https://github.com/user-attachments/files/21089183/Blank.diagram.pdf)
 
 ## License
-[Blank diagram.pdf](https://github.com/user-attachments/files/21089183/Blank.diagram.pdf)
+
 
 MIT
 
