@@ -13,9 +13,11 @@ const app = express();
 const PORT = 5000;
 
 // MongoDB connection
-mongoose.connect('process.env.MONGODB_URI', {
-  useNewUrlParser: true,
-}).then(() => console.log('✅ MongoDB connected'))
+const uri = process.env.MONGODB_URI;
+console.log('Using URI:', uri ? uri.slice(0, 30) + '...' : 'undefined'); // temporary debug
+
+mongoose.connect(uri)
+  .then(() => console.log('✅ MongoDB Atlas connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
 
 // CORS for frontend access
