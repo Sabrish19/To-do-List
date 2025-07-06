@@ -26,8 +26,8 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',                    // dev
-      'https://to-do-list-1ttx.onrender.com',           // Vercel frontend
-      process.env.FRONTEND_URL                   // optional env var
+      'https://to-do-list-sigma-nine-70.vercel.app',           // Vercel frontend
+                
     ],
     credentials: true
   })

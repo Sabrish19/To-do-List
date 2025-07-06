@@ -15,6 +15,17 @@ passport.use(
     }
   )
 );
+app.get('/auth/google/callback', 
+  passport.authenticate('google', {
+    failureRedirect: '/login',
+    session: true
+  }),
+  function(req, res) {
+    // Redirect to your frontend dashboard after login
+    res.redirect('https://to-do-list-sigma-nine-70.vercel.app');
+  }
+);
+
 
 // (de)serialize if you use sessions
 passport.serializeUser((user, done) => done(null, user));
