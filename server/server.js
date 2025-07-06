@@ -13,9 +13,8 @@ const app = express();
 const PORT = 5000;
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/taskmaster', {
+mongoose.connect('process.env.MONGODB_URI', {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
 }).then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB error:', err));
 
