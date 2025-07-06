@@ -71,8 +71,7 @@ npm run dev
 ## Deployment URLs
 
 * Frontend (Vercel): [https://to-do-list-sigma-nine-70.vercel.app](https://to-do-list-sigma-nine-70.vercel.app)
-* Backend (Render): [https://to-do-list-1ttx.onrender.com](https://to-do-list-1ttx.onrender.com)
-* Todolist:(http://to-do-list-sigma-nine-70.vercel.app)
+* Backend (Render): [https://to-do-list-1ttx.onrender.com](https://to-do-list-1ttx.onrender.com) 
 
 ## Authorized OAuth URLs
 
