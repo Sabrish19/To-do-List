@@ -21,10 +21,18 @@ mongoose.connect(uri)
   .catch(err => console.error('❌ MongoDB error:', err));
 
 // CORS for frontend access
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
+// server/server.js  – CORS
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',                    // dev
+      'https://to-do-list.vercel.app',           // Vercel frontend
+      process.env.FRONTEND_URL                   // optional env var
+    ],
+    credentials: true
+  })
+);
+
 
 // Body parser
 app.use(express.json());

@@ -149,8 +149,13 @@ function App() {
     setTimeout(() => setToast(''), 3000);
   };
 
-  const handleLogin = () => window.location.href = 'http://localhost:5000/auth/google';
+  const API_BASE = import.meta.env.VITE_API_URL;   // already set on Vercel
+
+const handleLogin = () => {
+  window.location.href = `${API_BASE}/auth/google`;
+};
   const handleLogout = () => window.location.href = 'http://localhost:5000/auth/logout';
+  
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'completed') return task.completed;
