@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://to-do-list-1ttx.onrender.com';
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState('');
@@ -34,9 +37,8 @@ function App() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch('http://localhost:5000/auth/user', { credentials: 'include' });
-      const data = await res.json();
-      if (data.user) setUser(data.user);
+      const res = await axios.get('/auth/user');
+      if (res.data.user) setUser(res.data.user);
     } catch {
       setToast('You are offline or server is down.');
     }
@@ -44,23 +46,16 @@ function App() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/tasks', { withCredentials: true });
+      const res = await axios.get('/api/tasks');
       setTasks(res.data);
     } catch {
-      setToast(' No tasks.');
+      setToast('No tasks.');
     }
   };
 
   const addTask = async () => {
-    if (!taskInput.trim()) {
-      showToast('Task description is required.');
-      return;
-    }
-
-    if (!assignee.trim()) {
-      showToast('You must assign this task to someone.');
-      return;
-    }
+    if (!taskInput.trim()) return showToast('Task description is required.');
+    if (!assignee.trim()) return showToast('You must assign this task to someone.');
 
     try {
       const newTask = {
@@ -72,7 +67,7 @@ function App() {
         startTime,
         endTime,
       };
-      const res = await axios.post('http://localhost:5000/api/tasks', newTask, { withCredentials: true });
+      const res = await axios.post('/api/tasks', newTask);
       setTasks([...tasks, res.data]);
       setTaskInput('');
       setAssignee('');
@@ -88,7 +83,7 @@ function App() {
 
   const deleteTask = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`, { withCredentials: true });
+      await axios.delete(`/api/tasks/${id}`);
       setTasks(tasks.filter(t => t._id !== id));
       showToast('Task deleted.');
     } catch {
@@ -98,9 +93,7 @@ function App() {
 
   const toggleComplete = async (task) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/tasks/${task._id}`, {
-        completed: !task.completed
-      }, { withCredentials: true });
+      const res = await axios.put(`/api/tasks/${task._id}`, { completed: !task.completed });
       setTasks(tasks.map(t => (t._id === task._id ? res.data : t)));
       showToast('Task status updated.');
     } catch {
@@ -121,21 +114,14 @@ function App() {
   };
 
   const saveEdit = async (id) => {
-    if (!editText.trim()) {
-      showToast('Task text cannot be empty.');
-      return;
-    }
-
-    if (!editAssignee.trim()) {
-      showToast('Assignee cannot be empty.');
-      return;
-    }
+    if (!editText.trim()) return showToast('Task text cannot be empty.');
+    if (!editAssignee.trim()) return showToast('Assignee cannot be empty.');
 
     try {
-      const res = await axios.put(`http://localhost:5000/api/tasks/${id}`, {
+      const res = await axios.put(`/api/tasks/${id}`, {
         text: editText,
         assignee: editAssignee
-      }, { withCredentials: true });
+      });
       setTasks(tasks.map(t => (t._id === id ? res.data : t)));
       cancelEdit();
       showToast('Task updated.');
@@ -149,13 +135,13 @@ function App() {
     setTimeout(() => setToast(''), 3000);
   };
 
-  const API_BASE = import.meta.env.VITE_API_URL;   // already set on Vercel
+  const handleLogin = () => {
+    window.location.href = `${axios.defaults.baseURL}/auth/google`;
+  };
 
-const handleLogin = () => {
-  window.location.href = `${API_BASE}/auth/google`;
-};
-  const handleLogout = () => window.location.href = 'http://localhost:5000/auth/logout';
-  
+  const handleLogout = () => {
+    window.location.href = `${axios.defaults.baseURL}/auth/logout`;
+  };
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'completed') return task.completed;
@@ -165,13 +151,10 @@ const handleLogin = () => {
 
   return (
     <div className="todo-box">
-      <h1>TaskMaster ✨</h1>
+      <h1 style={{ textAlign: 'center' }}>TaskMaster ✨</h1>
 
       <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-        <button className="toggle-theme" onClick={() => document.body.classList.toggle('dark-mode')}>
-    Theme
-  </button>
-
+        <button className="toggle-theme" onClick={toggleTheme}>Theme</button>
       </div>
 
       {!user ? (
@@ -179,7 +162,7 @@ const handleLogin = () => {
       ) : (
         <>
           <div className="user-info">
-            <p>Welcome,</p>
+            <p>Welcome</p>
             <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
           </div>
 

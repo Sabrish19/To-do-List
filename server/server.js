@@ -26,7 +26,7 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',                    // dev
-      'https://to-do-list.vercel.app',           // Vercel frontend
+      'https://to-do-list-1ttx.onrender.com',           // Vercel frontend
       process.env.FRONTEND_URL                   // optional env var
     ],
     credentials: true
@@ -41,7 +41,7 @@ app.use(express.json());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret', // fallback prevents crash if env is missing
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: { secure: false }, // set to true if using HTTPS in production
 }));
 
