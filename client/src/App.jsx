@@ -1,0 +1,242 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import axios from 'axios';
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [taskInput, setTaskInput] = useState('');
+  const [user, setUser] = useState(null);
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [editAssignee, setEditAssignee] = useState('');
+  const [status, setStatus] = useState('in progress');
+  const [assignee, setAssignee] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [toast, setToast] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    fetchUser();
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const fetchUser = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/auth/user', { credentials: 'include' });
+      const data = await res.json();
+      if (data.user) setUser(data.user);
+    } catch {
+      setToast('You are offline or server is down.');
+    }
+  };
+
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/tasks', { withCredentials: true });
+      setTasks(res.data);
+    } catch {
+      setToast(' No tasks.');
+    }
+  };
+
+  const addTask = async () => {
+    if (!taskInput.trim()) {
+      showToast('Task description is required.');
+      return;
+    }
+
+    if (!assignee.trim()) {
+      showToast('You must assign this task to someone.');
+      return;
+    }
+
+    try {
+      const newTask = {
+        text: taskInput,
+        status,
+        assignee,
+        startDate,
+        endDate,
+        startTime,
+        endTime,
+      };
+      const res = await axios.post('http://localhost:5000/api/tasks', newTask, { withCredentials: true });
+      setTasks([...tasks, res.data]);
+      setTaskInput('');
+      setAssignee('');
+      setStartDate('');
+      setEndDate('');
+      setStartTime('');
+      setEndTime('');
+      showToast('Task added!');
+    } catch {
+      showToast('Failed to add task.');
+    }
+  };
+
+  const deleteTask = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/tasks/${id}`, { withCredentials: true });
+      setTasks(tasks.filter(t => t._id !== id));
+      showToast('Task deleted.');
+    } catch {
+      showToast('Failed to delete task.');
+    }
+  };
+
+  const toggleComplete = async (task) => {
+    try {
+      const res = await axios.put(`http://localhost:5000/api/tasks/${task._id}`, {
+        completed: !task.completed
+      }, { withCredentials: true });
+      setTasks(tasks.map(t => (t._id === task._id ? res.data : t)));
+      showToast('Task status updated.');
+    } catch {
+      showToast('Could not update task.');
+    }
+  };
+
+  const startEdit = (task) => {
+    setEditTaskId(task._id);
+    setEditText(task.text);
+    setEditAssignee(task.assignee || '');
+  };
+
+  const cancelEdit = () => {
+    setEditTaskId(null);
+    setEditText('');
+    setEditAssignee('');
+  };
+
+  const saveEdit = async (id) => {
+    if (!editText.trim()) {
+      showToast('Task text cannot be empty.');
+      return;
+    }
+
+    if (!editAssignee.trim()) {
+      showToast('Assignee cannot be empty.');
+      return;
+    }
+
+    try {
+      const res = await axios.put(`http://localhost:5000/api/tasks/${id}`, {
+        text: editText,
+        assignee: editAssignee
+      }, { withCredentials: true });
+      setTasks(tasks.map(t => (t._id === id ? res.data : t)));
+      cancelEdit();
+      showToast('Task updated.');
+    } catch {
+      showToast('Failed to save edit.');
+    }
+  };
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  const handleLogin = () => window.location.href = 'http://localhost:5000/auth/google';
+  const handleLogout = () => window.location.href = 'http://localhost:5000/auth/logout';
+
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'completed') return task.completed;
+    if (filter === 'in progress') return !task.completed;
+    return true;
+  });
+
+  return (
+    <div className="todo-box">
+      <h1>TaskMaster ✨</h1>
+
+      <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+        <button className="toggle-theme" onClick={() => document.body.classList.toggle('dark-mode')}>
+    Theme
+  </button>
+
+      </div>
+
+      {!user ? (
+        <button className="google-btn" onClick={handleLogin}>Sign in with Google</button>
+      ) : (
+        <>
+          <div className="user-info">
+            <p>Welcome,</p>
+            <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
+          </div>
+
+          <div className="filters">
+            <select value={filter} onChange={e => setFilter(e.target.value)}>
+              <option value="all">All</option>
+              <option value="completed">Completed</option>
+              <option value="in progress">In Progress</option>
+            </select>
+          </div>
+
+          <div className="input-area">
+            <input value={taskInput} onChange={e => setTaskInput(e.target.value)} placeholder="Task description..." />
+            <input value={assignee} onChange={e => setAssignee(e.target.value)} placeholder="Assign to (email/username)" />
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+            <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} />
+            <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
+            <select value={status} onChange={e => setStatus(e.target.value)}>
+              <option value="in progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button id="addBtn" onClick={addTask}>+</button>
+          </div>
+
+          <ul className="task-list">
+            {filteredTasks.map(task => (
+              <li key={task._id} className={`task ${task.completed ? 'complete' : ''}`}>
+                {editTaskId === task._id ? (
+                  <>
+                    <input className="task-text" value={editText} onChange={e => setEditText(e.target.value)} />
+                    <input className="task-text" value={editAssignee} onChange={e => setEditAssignee(e.target.value)} />
+                    <div className="actions">
+                      <button onClick={() => saveEdit(task._id)}>💾</button>
+                      <button onClick={cancelEdit}>❌</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="task-text" onClick={() => toggleComplete(task)}>
+                      <strong>{task.text}</strong><br />
+                      <small>
+                        👤 {task.assignee?.trim() || 'Unassigned'} | {task.completed ? '✅ Completed' : '🔄 In Progress'}<br />
+                        📅 {task.startDate || 'Start: —'} → {task.endDate || 'End: —'}<br />
+                        🕒 {task.startTime || '--:--'} - {task.endTime || '--:--'}
+                      </small>
+                    </span>
+                    <div className="actions">
+                      <button onClick={() => startEdit(task)}>✏️</button>
+                      <button onClick={() => deleteTask(task._id)}>🗑️</button>
+                    </div>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {toast && <div className="toast">{toast}</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default App;
