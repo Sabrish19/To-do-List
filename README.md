@@ -68,20 +68,6 @@ VITE_API_URL=https://your-backend-domain
 npm run dev
 ```
 
-## Deployment URLs
-
-* Frontend (Vercel): [https://to-do-list-sigma-nine-70.vercel.app](https://to-do-list-sigma-nine-70.vercel.app)
-* Backend (Render): [https://to-do-list-1ttx.onrender.com](https://to-do-list-1ttx.onrender.com) 
-
-## Authorized OAuth URLs
-
-* Authorized JavaScript origins:
-
-  * [https://to-do-list-sigma-nine-70.vercel.app](https://to-do-list-sigma-nine-70.vercel.app)
-* Authorized redirect URIs:
-
-  * [https://to-do-list-1ttx.onrender.com/auth/google/callback](https://to-do-list-1ttx.onrender.com/auth/google/callback)
-
 ## Assumptions
 
 * Only authenticated users can add and view tasks
